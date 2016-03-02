@@ -41,7 +41,6 @@ function processFile(filePath, outFile) {
         }
         else if (tag == "**") {
             recordCount++;
-            console.log(recordCount);
         } else {
             let val = tagCounts[tag];
             if (val === undefined) {
@@ -52,25 +51,24 @@ function processFile(filePath, outFile) {
         }
     });
     
-    console.log(recordCount);
-    
-    let basename = path.basename(filePath);
-    outFile.write(basename + "\n");
-    outFile.write("-".repeat(basename.length) + "\n\n");
-    outFile.write(recordCount.toString());
-    outFile.write(`Total records: ${recordCount}\n\n`);
-    
-    let tagCountsArray = [];
-    for (let elem in tagCounts) {
-        tagCountsArray.push([tagCounts[elem], elem]);
-    }
-    tagCountsArray.sort();
-    for (let elem of tagCountsArray) {
-        let count = elem[0];
-        let tag2 = elem[1];
-        outFile.write(`${" ".repeat(8 - count.toString().length)} ${tag2}\n`);
-    }
-    outFile.write("\n\n");
-    
-    console.log(Object.keys(tagCounts).length, tagCountsArray.length);
+    lineReader.on("close", function() {
+        let basename = path.basename(filePath);
+        outFile.write(basename + "\n");
+        outFile.write("-".repeat(basename.length) + "\n");
+        outFile.write(`Total records: ${recordCount}\n\n`);
+        
+        let tagCountsArray = [];
+        for (let elem in tagCounts) {
+            tagCountsArray.push([tagCounts[elem], elem]);
+        }
+        tagCountsArray.sort(function(a, b) {
+            return b[0] - a[0]
+        });
+        for (let elem of tagCountsArray) {
+            let count = elem[0];
+            let tag = elem[1];
+            outFile.write(`${" ".repeat(8 - count.toString().length)}${count} ${tag}\n`);
+        }
+        outFile.write("\n\n");
+    });
 }
