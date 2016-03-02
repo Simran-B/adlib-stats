@@ -42,19 +42,16 @@ function processFile(filePath, outFile) {
         else if (tag == "**") {
             recordCount++;
         } else {
-            let val = tagCounts[tag];
-            if (val === undefined) {
-                tagCounts[tag] = 1;
-            } else {
-                tagCounts[tag]++;
-            }
+            tagCounts[tag] = tagCounts[tag] + 1 || 1;
         }
     });
     
+    // must wait for close event to access the final states of the variables
     lineReader.on("close", function() {
         let basename = path.basename(filePath);
         outFile.write(basename + "\n");
         outFile.write("-".repeat(basename.length) + "\n");
+        outFile.write(`Path: ${path.resolve(filePath)}\n`)
         outFile.write(`Total records: ${recordCount}\n\n`);
         
         let tagCountsArray = [];
