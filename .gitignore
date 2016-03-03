@@ -1,2 +1,3 @@
-stats.txt 
-*.dat 
+# ignore result and test files
+stats.txt
+*.dat
